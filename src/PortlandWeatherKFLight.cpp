@@ -260,7 +260,7 @@ struct PortlandWeatherKFLight : Module {
 
 	}
 
-	const char* tapNames[16+2] {"1","2","3","4","5","6","7","8","9","10","11","12","13","14","15","16","ALL","EXT"};
+	const char* tapNames[8+2] {"1","2","3","4","5","6","7","8","ALL","EXT"};
 	const char* grainNames[MAX_GRAINS] {"1","2","4","Raw"};
 
 
@@ -962,8 +962,8 @@ PortlandWeatherKFLightWidget::PortlandWeatherKFLightWidget(PortlandWeatherKFLigh
 	addInput(Port::create<LogicPort>(Vec(5+140, 25+(3*36)), Port::INPUT, module, PortlandWeatherKFLight::FEEDBACK_TONE_INPUT));
 	addParam(ParamWidget::create<KnobGreen>(Vec(35+140, 21 + (3*36)), module, PortlandWeatherKFLight::FEEDBACK_TONE_PARAM, 0.0f, 5, 0.0f));
 
-	addParam(ParamWidget::create<SnapKnobGreen>(Vec(35, 28 + 15  + (4*36)), module, PortlandWeatherKFLight::FEEDBACK_TAP_L_PARAM, 0.0f, 17.0f, 15.0f));
-	addParam(ParamWidget::create<SnapKnobGreen>(Vec(35+100, 28 + 15  + (4*36)), module, PortlandWeatherKFLight::FEEDBACK_TAP_R_PARAM, 0.0f, 17.0f, 15.0f));
+	addParam(ParamWidget::create<SnapKnobGreen>(Vec(35, 28 + 15  + (4*36)), module, PortlandWeatherKFLight::FEEDBACK_TAP_L_PARAM, 0.0f, 9.0f, 7.0f));
+	addParam(ParamWidget::create<SnapKnobGreen>(Vec(35+100, 28 + 15  + (4*36)), module, PortlandWeatherKFLight::FEEDBACK_TAP_R_PARAM, 0.0f, 9.0f, 7.0f));
 	addParam(ParamWidget::create<KnobGreen>(Vec(35, 28 + 15  + (5*36)), module, PortlandWeatherKFLight::FEEDBACK_L_SLIP_PARAM, -0.5f, 0.5f, 0.0f));
 	addParam(ParamWidget::create<KnobGreen>(Vec(35+100, 28 + 15  + (5*36)), module, PortlandWeatherKFLight::FEEDBACK_R_SLIP_PARAM, -0.5f, 0.5f, 0.0f));
 	addParam(ParamWidget::create<SnapKnobGreen>(Vec(35, 28 + 15  + (6*36)), module, PortlandWeatherKFLight::FEEDBACK_L_PITCH_SHIFT_PARAM, -24.0f, 24.0f, 0.0f));
