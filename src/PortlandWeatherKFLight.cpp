@@ -204,7 +204,7 @@ struct PortlandWeatherKFLight : Module {
 	int division;
 	float time = 0.0f;
 	float duration = 0.0f;
-	float baseDelay;
+	float baseDelay = 0.0f;
 	bool secondClockReceived = false;
 
 	LowFrequencyOscillator sinOsc[2];
@@ -212,7 +212,7 @@ struct PortlandWeatherKFLight : Module {
 	ReverseRingBuffer2<float, HISTORY_SIZE> reverseHistoryBuffer[CHANNELS];
 	float pitchShiftBuffer[NUM_TAPS+1][CHANNELS][MAX_GRAINS][MAX_GRAIN_SIZE];
 	clouds::FloatFrame pitchShiftOut_;
-	DoubleRingBuffer<float, 16> outBuffer[NUM_TAPS+1][CHANNELS][2];
+	DoubleRingBuffer2<float, 16> outBuffer[NUM_TAPS+1][CHANNELS][2];
 	SampleRateConverter<1> src;
 
 	float delay = 0.0f;
@@ -221,6 +221,8 @@ struct PortlandWeatherKFLight : Module {
 	float dry = 0.0f;
 	float in = 0.0f;
 	float feedbackInput = 0.0f;
+	//test
+	int test = 0;
 
 	float lerp(float v0, float v1, float t) {
 	  return (1 - t) * v0 + t * v1;
@@ -330,10 +332,10 @@ void PortlandWeatherKFLight::step() {
 
 	if (clearBufferTrigger.process(params[CLEAR_BUFFER_PARAM].value)) {
 		for(int i=0;i<CHANNELS;i++) {
-			historyBuffer[i][0].clear();
-			historyBuffer[i][1].clear();
+			//historyBuffer[i][0].clear();
+			//historyBuffer[i][1].clear();
 		}
-		std::cout<<in<<" "<<dry<<" "<<feedbackInput<<std::endl;
+		std::cout<<test<<" "<<dry<<" "<<feedbackInput<<std::endl;
 	}
 
 
@@ -394,7 +396,7 @@ void PortlandWeatherKFLight::step() {
 		}
 		feedbackTap[channel] = (int)clamp(params[FEEDBACK_TAP_L_PARAM+channel].value + (inputs[FEEDBACK_TAP_L_INPUT+channel].value * 0.1f),0.0f,17.0f);
 		feedbackSlip[channel] = clamp(params[FEEDBACK_L_SLIP_PARAM+channel].value + (inputs[FEEDBACK_L_SLIP_CV_INPUT+channel].value * 0.1f),-0.5f,0.5f);
-		float feedbackAmount = clamp(params[FEEDBACK_PARAM].value + (inputs[FEEDBACK_INPUT].value * 0.1f), 0.0f, 1.0f);
+		float feedbackAmount = clamp(params[FEEDBACK_PARAM].value + (inputs[FEEDBACK_INPUT].value * 0.1f), 0.0f, 0.99f);
 		feedbackInput = lastFeedback[channel];
 
 		dry = in + feedbackInput * feedbackAmount;
@@ -427,6 +429,7 @@ void PortlandWeatherKFLight::step() {
 				tapStacked[tap] = !tapStacked[tap];
 			}
 
+
 			//float pitch_grain_size = 1.0f; //Can be between 0 and 1
 			float pitch_grain_size = params[GRAIN_SIZE_PARAM].value; //Can be between 0 and 1
 			float pitch,detune;
@@ -458,7 +461,7 @@ void PortlandWeatherKFLight::step() {
 
 			// Compute delay time in seconds
 			delay = baseDelay * lerp(tapGroovePatterns[0][delayTap],tapGroovePatterns[tapGroovePattern][delayTap],grooveAmount); //Balance between straight time and groove
-
+			test = tapGroovePattern;
 			//External feedback time
 			if(tap == NUM_TAPS && feedbackTap[channel] == NUM_TAPS+1 && inputs[EXTERNAL_DELAY_TIME_INPUT].active) {
 				delay = clamp(inputs[EXTERNAL_DELAY_TIME_INPUT].value, 0.001f, 10.0f);
@@ -653,6 +656,8 @@ void PortlandWeatherKFLight::step() {
 		float out = crossfade(in, wet, mix);  // Not sure this should be wet
 
 		outputs[OUT_L_OUTPUT + channel].value = out;
+		if (channel ==1)
+			outputs[OUT_L_OUTPUT + channel].value = feedbackValue;
 	}
 }
 
